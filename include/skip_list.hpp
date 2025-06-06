@@ -9,6 +9,7 @@
 #include <stdexcept>
 #include <type_traits>
 #include <vector>
+#include <concepts> // добавлено
 
 /**
  * @brief A skip list implementation for sorted storage and fast lookup.
@@ -77,7 +78,9 @@ public:
 
         basic_iterator() : ptr_(nullptr) {}
 
-        template <bool B = IsConst, typename = std::enable_if_t<B>>
+        // ВАЖНО: Здесь заменено enable_if на requires!
+        template <bool B = IsConst>
+        requires B
         basic_iterator(basic_iterator<false> const& other) noexcept
                 : ptr_(other.ptr_) {}
 
@@ -136,10 +139,8 @@ public:
      * @param first     Begin iterator.
      * @param last      End iterator.
      */
-    template <typename InputIt,
-            typename = std::enable_if_t<std::is_convertible_v<
-                    typename std::iterator_traits<InputIt>::iterator_category,
-                    std::input_iterator_tag>>>
+    template <typename InputIt>
+    requires std::input_iterator<InputIt>
     skip_list(InputIt first, InputIt last) : skip_list() {
         for (; first != last; ++first)
             insert(*first);
@@ -164,11 +165,11 @@ public:
     /** @brief Move constructor. */
     skip_list(skip_list&& o) noexcept
             : head_(o.head_),
-            level_(o.level_),
-    size_(o.size_),
-    cmp_(std::move(o.cmp_)),
-    gen_(std::random_device{}()),
-    dist_(0.0, 1.0) {
+              level_(o.level_),
+              size_(o.size_),
+              cmp_(std::move(o.cmp_)),
+              gen_(std::random_device{}()),
+              dist_(0.0, 1.0) {
         o.head_ = nullptr;
         o.size_ = 0;
     }

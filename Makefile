@@ -1,5 +1,5 @@
 CXX = g++
-CXXFLAGS = -std=c++17 -Wall -Wextra -Werror -Iinclude
+CXXFLAGS = -std=c++20 -Wall -Wextra -Werror -Iinclude
 
 TARGET = tests
 TEST_SRC = test/test_skip_list.cpp
